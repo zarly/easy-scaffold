@@ -1,0 +1,16 @@
+{
+  "name": "easy-scaffold",
+  "description": "Lightweight code generation tool",
+  "version": "1.0.0",
+  "main": "cli.js",
+  "license": "MIT",
+  "dependencies": {
+    "cli-color": "2.0.0",
+    "ejs": "3.1.3",
+    "lodash": "4.17.15",
+    "yargs": "15.3.1"
+  },
+  "bin": {
+    "easy-scaffold": "./cli.js"
+  }
+}
