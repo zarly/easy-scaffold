@@ -21,6 +21,7 @@ exports.handleTemplate = function handleTemplate (input, output, data, options =
                             const varName = match[1];
                             console.warn(clc.yellow(`Переменная "${varName}", используемая в шаблоне ${input}, не объявлена`));
                             const value = await ask(`${varName}:`);
+                            console.log(clc.blackBright(`${varName} = ${JSON.stringify(value)}`));
                             data[varName] = value;
                         } else {
                             throw e;
