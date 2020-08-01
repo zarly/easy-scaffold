@@ -21,7 +21,7 @@ module.exports = async function scaffold (configName, args, cwd) {
     const { getConfig } = require(configFileName);
     
     const config = await getConfig(args);
-    const data = await config.data();
+    const data = config.data ? await config.data() : args;
     console.log('data:', clc.blackBright(JSON.stringify(data)));
     
     for (let i = 0; i < config.entities.length; i++) {
