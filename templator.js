@@ -4,7 +4,13 @@ const ejs = require('ejs');
 var clc = require("cli-color");
 const { ask } = require('./requestor');
 
-exports.handleTemplate = function handleTemplate (input, output, data, options = {}) {
+const defaultOptions = {
+    escape (data) {
+        return JSON.stringify(data);
+    }
+};
+
+exports.handleTemplate = function handleTemplate (input, output, data, options = defaultOptions) {
     return new Promise(function (resolve) {
         fs.readFile(input, { encoding: 'utf-8' }, async function onRead (readError, inputText) {
             if (readError) throw readError;

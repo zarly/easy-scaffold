@@ -1,17 +1,17 @@
 {
   "name": "easy-scaffold",
   "description": "Lightweight code generation tool",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "main": "index.js",
   "bin": {
     "easy-scaffold": "./cli.js"
   },
-  "engines": { 
-    "node" : ">=10" 
+  "engines": {
+    "node": ">=10"
   },
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/zarly/easy-scaffold"
+    "type": "git",
+    "url": "https://github.com/zarly/easy-scaffold"
   },
   "license": "MIT",
   "dependencies": {

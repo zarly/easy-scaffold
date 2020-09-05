@@ -23,9 +23,11 @@ exports.getConfig = function getConfig (args) {
 ```
 Создаём один или несколько шаблонов в формате ejs:
 ```
-const <%= name %> = <%= value %>;
+const <%- name %> = <%= value %>;
 
 ```
+Конструкция <%- myVarName %> вставляет значение, эквивалентное myVarName.toString()
+Конструкция <%= myVarName %> вставляет значение, эквивалентное JSON.stringify(myVarName)
 Запускаем, указывая конфиг-файл первым аргументом, а переменные - именованными параметрами:
 ```
 easy-scaffold ./templates/crud/index.js --name myVar --otherParam 123
@@ -63,13 +65,13 @@ exports.getConfig = function getConfig (args) {
 
 В шаблонах и конфиге у любой переменной есть свойства для преобразования кейсов. Например, такой шаблон:
 ```
-const camelCase = "<%= someStr.camelCase %>";
-const snakeCase = "<%= someStr.snakeCase %>";
-const kebabCase = "<%= someStr.kebabCase %>";
-const lowerCase = "<%= someStr.lowerCase %>";
-const upperCase = "<%= someStr.upperCase %>";
-const constCase = "<%= someStr.constCase %>";
-const classCase = "<%= someStr.classCase %>";
+const camelCase = <%= someStr.camelCase %>;
+const snakeCase = <%= someStr.snakeCase %>;
+const kebabCase = <%= someStr.kebabCase %>;
+const lowerCase = <%= someStr.lowerCase %>;
+const upperCase = <%= someStr.upperCase %>;
+const constCase = <%= someStr.constCase %>;
+const classCase = <%= someStr.classCase %>;
 ```
 вернёт такой результат:
 ```
