@@ -5,7 +5,7 @@ const path = require('path');
 var clc = require('cli-color');
 const { ask } = require('./requestor');
 const execSync = require('child_process').execSync;
-const { handleTemplate } = require('./templator');
+const { handleTemplateDir, handleTemplateFile } = require('./templator');
 
 function resolveFile (filename, defaultDir, cwd) {
     return path.isAbsolute(filename) ? path.resolve(filename) : 
@@ -16,6 +16,15 @@ function resolveFile (filename, defaultDir, cwd) {
 function ensureParentDirsExist (filename) {
     const parentDir = path.dirname(filename);
     return fs.promises.mkdir(parentDir, { recursive: true });
+}
+
+function ensureDirsExist (dirname) {
+    return fs.promises.mkdir(dirname, { recursive: true });
+}
+
+async function isDir (path) {
+    const stat = await fs.promises.stat(path);
+    return stat.isDirectory();
 }
 
 module.exports = async function scaffold (configName, args, cwd) {
@@ -50,9 +59,16 @@ module.exports = async function scaffold (configName, args, cwd) {
         if (input && output) {
             const resolvedInput = resolveFile(input, configDir, cwd);
             const resolvedOutput = resolveFile(output, configDir, cwd);
-            console.log(clc.blackBright(resolvedInput), '=>', clc.blackBright(resolvedOutput));
-            await ensureParentDirsExist(resolvedOutput);
-            await handleTemplate(resolvedInput, resolvedOutput, data);
+
+            if (await isDir(resolvedInput)) {
+                console.log(clc.blackBright(resolvedInput), '*=>', clc.blackBright(resolvedOutput));
+                await ensureDirsExist(resolvedOutput);
+                await handleTemplateDir(resolvedInput, resolvedOutput, data);
+            } else {
+                console.log(clc.blackBright(resolvedInput), '=>', clc.blackBright(resolvedOutput));
+                await ensureParentDirsExist(resolvedOutput);
+                await handleTemplateFile(resolvedInput, resolvedOutput, data);
+            }
         } else if (cmd) {
             console.log('command:', clc.blackBright(cmd));
             execSync(cmd, { stdio: 'inherit', cwd });
