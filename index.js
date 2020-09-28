@@ -72,6 +72,10 @@ module.exports = async function scaffold (configName, args, cwd) {
         } else if (cmd) {
             console.log('command:', clc.blackBright(cmd));
             execSync(cmd, { stdio: 'inherit', cwd });
+        } else if (entity.scaffold) {
+            console.log('scaffold exec:', clc.blackBright(entity.scaffold));
+            await scaffold(entity.scaffold, entity.args, entity.cwd || cwd);
+            console.log('scaffold done:', clc.blackBright(entity.scaffold));
         } else {
             throw new Error('Unexpected format of entity:', entity);
         }
