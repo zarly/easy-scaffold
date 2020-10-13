@@ -7,10 +7,37 @@ const { ask } = require('./requestor');
 const execSync = require('child_process').execSync;
 const { handleTemplateDir, handleTemplateFile } = require('./templator');
 
+const ES_TEMPLATES_PATH = process.env.ES_TEMPLATES_PATH;
+
+async function isFileExisit (filename) {
+    const stat = await fs.promises.stat(filename).catch(() => false);
+    return Boolean(stat && stat.isFile());
+}
+
+async function resolveConfigFile (filename, cwd) {
+    if (path.isAbsolute(filename)) return path.resolve(filename);
+    
+    if (filename.indexOf('.') === -1) {
+        if (ES_TEMPLATES_PATH && await isFileExisit(path.resolve(ES_TEMPLATES_PATH, filename))) {
+            return path.resolve(ES_TEMPLATES_PATH, filename);
+        }
+    
+        if (await isFileExisit(path.resolve(cwd, 'templates', filename, 'index.js'))) {
+            return path.resolve(cwd, 'templates', filename, 'index.js');
+        }
+    }
+
+    if (await isFileExisit(path.resolve(cwd, filename))) {
+        return path.resolve(cwd, filename);
+    }
+
+    return null;
+}
+
 function resolveFile (filename, defaultDir, cwd) {
     return path.isAbsolute(filename) ? path.resolve(filename) : 
         filename[0] === '@' ? filename.replace(/^@/, cwd) :
-        path.resolve(path.join(defaultDir, filename));
+        path.resolve(defaultDir, filename);
 }
 
 function ensureParentDirsExist (filename) {
@@ -28,16 +55,19 @@ async function isDir (path) {
 }
 
 module.exports = async function scaffold (configName, args, cwd) {
-    cwd = cwd === undefined ? process.cwd() : cwd;
-    const configPath = resolveFile(configName, cwd, cwd);
+    cwd = cwd === undefined ? process.cwd() :
+        path.isAbsolute(cwd[0]) ? cwd : path.resolve(process.cwd(), cwd);
+    const configPath = await resolveConfigFile(configName, cwd);
+    if (!configPath) throw new Error(`Config file with name "${configName}" was not found`);
     const ext = path.extname(configPath);
     const configFileName = ext === '.js' ? configPath : path.join(configPath, 'index.js');
     const configDir = path.dirname(configFileName);
     
+    console.log('cwd:', clc.blackBright(cwd));
     console.log('config:', clc.blackBright(configFileName));
     const { getConfig } = require(configFileName);
     
-    const config = await getConfig(args);
+    const config = await getConfig(args, cwd);
     const data = config.data ? await config.data() : args;
     console.log('data:', clc.blackBright(JSON.stringify(data)));
 
@@ -71,7 +101,10 @@ module.exports = async function scaffold (configName, args, cwd) {
             }
         } else if (cmd) {
             console.log('command:', clc.blackBright(cmd));
-            execSync(cmd, { stdio: 'inherit', cwd });
+            execSync(cmd, { 
+                stdio: 'inherit', 
+                cwd: entity.cwd || cwd,
+            });
         } else if (entity.scaffold) {
             console.log('scaffold exec:', clc.blackBright(entity.scaffold));
             await scaffold(entity.scaffold, entity.args, entity.cwd || cwd);
@@ -80,4 +113,7 @@ module.exports = async function scaffold (configName, args, cwd) {
             throw new Error('Unexpected format of entity:', entity);
         }
     }
+
 }
+
+module.exports.resolveConfigFile = resolveConfigFile;

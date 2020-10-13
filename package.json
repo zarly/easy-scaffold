@@ -1,10 +1,11 @@
 {
   "name": "easy-scaffold",
   "description": "Lightweight code generation tool",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "main": "index.js",
   "bin": {
-    "easy-scaffold": "./cli.js"
+    "easy-scaffold": "./cli.js",
+    "es": "./cli.js"
   },
   "engines": {
     "node": ">=10"
