@@ -18,8 +18,8 @@ async function resolveConfigFile (filename, cwd) {
     if (path.isAbsolute(filename)) return path.resolve(filename);
     
     if (filename.indexOf('.') === -1) {
-        if (ES_TEMPLATES_PATH && await isFileExisit(path.resolve(ES_TEMPLATES_PATH, filename))) {
-            return path.resolve(ES_TEMPLATES_PATH, filename);
+        if (ES_TEMPLATES_PATH && await isFileExisit(path.resolve(ES_TEMPLATES_PATH, filename, 'index.js'))) {
+            return path.resolve(ES_TEMPLATES_PATH, filename, 'index.js');
         }
     
         if (await isFileExisit(path.resolve(cwd, 'templates', filename, 'index.js'))) {
