@@ -1,7 +1,7 @@
 {
   "name": "easy-scaffold",
   "description": "Lightweight code generation tool",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "main": "index.js",
   "bin": {
     "easy-scaffold": "./cli.js",
