@@ -8,7 +8,7 @@ module.exports = {
     },
     async execute (entity, { cwd, configDir, data }) {
         const filename = resolveFile(entity.file, configDir, cwd);
-        console.log('modify:', clc.blackBright(filename));
+        console.log('modify file:', clc.blackBright(filename));
         
         const input = await fs.promises.readFile(filename, { encoding: 'utf8' });
         const output = await entity.modify(input, data);
