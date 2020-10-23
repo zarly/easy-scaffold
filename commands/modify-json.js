@@ -13,7 +13,7 @@ module.exports = {
         const inputText = await fs.promises.readFile(filename, { encoding: 'utf8' });
         const inputJson = JSON.parse(inputText);
         const outputJson = await entity.modify(inputJson, data);
-        const outputText = JSON.stringify(outputJson, null, 2);
+        const outputText = JSON.stringify(outputJson || inputJson, null, 2);
         await fs.promises.writeFile(filename, outputText, { encoding: 'utf8' });
     },
 };

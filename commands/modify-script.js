@@ -17,7 +17,7 @@ module.exports = {
         const inputText = await fs.promises.readFile(filename, { encoding: 'utf8' });
         const inputFile = ts.createSourceFile(filename, inputText, ts.ScriptTarget.ES2015, true, ts.ScriptKind.TS);
         const outputFile = await entity.modify(inputFile, data, ts);
-        const outputText = ts.createPrinter().parseFile(outputFile);
+        const outputText = ts.createPrinter().parseFile(outputFile || inputFile);
         await fs.promises.writeFile(filename, outputText, { encoding: 'utf8' });
     },
 };
