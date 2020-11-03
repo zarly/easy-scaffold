@@ -32,6 +32,8 @@ module.exports = async function scaffold (configName, args, cwd) {
     
     for (let i = 0; i < config.entities.length; i++) {
         const entity = config.entities[i];
+        if (!entity) continue; // пропускаем шаг, если передан null или undefined (чтобы можно было пропускать шаги тернарным оператором при их написании) 
+
         let isEntityHandled = false;
         for (let n = 0; n < commands.length; n++) {
             const command = commands[n];
