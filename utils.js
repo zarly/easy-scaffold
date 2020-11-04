@@ -13,23 +13,27 @@ async function isFileExisit (filename) {
     return Boolean(stat && stat.isFile());
 }
 
-async function resolveAndCheckConfigFileName (filename, cwd) {
-    const configPath = await resolveConfigFile(filename, cwd);
-    if (!configPath) throw new Error(`Config file with name "${configName}" was not found`);
+async function resolveAndCheckConfigFileName (filename, cwd, templatePaths = []) {
+    const configPath = await resolveConfigFile(filename, cwd, templatePaths);
+    if (!configPath) throw new Error(`Config file with name "${filename}" was not found in ${templatePaths}`);
     const ext = path.extname(configPath);
     return ext === '.js' ? configPath : path.join(configPath, 'index.js');
 }
 
-async function resolveConfigFile (filename, cwd) {
+async function resolveConfigFile (filename, cwd, templatePaths = []) {
     if (path.isAbsolute(filename)) return path.resolve(filename);
-    
+
     if (filename.indexOf('.') === -1) {
         if (ES_TEMPLATES_PATH && await isFileExisit(path.resolve(ES_TEMPLATES_PATH, filename, 'index.js'))) {
             return path.resolve(ES_TEMPLATES_PATH, filename, 'index.js');
         }
-    
-        if (await isFileExisit(path.resolve(cwd, 'templates', filename, 'index.js'))) {
-            return path.resolve(cwd, 'templates', filename, 'index.js');
+
+        const paths = [cwd].concat(templatePaths).filter(it => it);
+        for(let i = 0; i < paths.length; i++) {
+            const dir = paths[i];
+            if (await isFileExisit(path.resolve(dir, 'templates', filename, 'index.js'))) {
+                return path.resolve(dir, 'templates', filename, 'index.js');
+            }
         }
     }
 

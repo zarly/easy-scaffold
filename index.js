@@ -2,13 +2,13 @@
 require('./string');
 const path = require('path');
 const clc = require('cli-color');
-const { resolveCwd, resolveConfigFile, resolveAndCheckConfigFileName } = require('./utils');
+const { resolveCwd, resolveAndCheckConfigFileName } = require('./utils');
 const { ask } = require('./requestor');
 const commands = require('./commands');
 
 async function prepare(configName, args, options) {
     const cwd = resolveCwd(options.cwd);
-    const configFileName = await resolveAndCheckConfigFileName(configName, cwd);
+    const configFileName = await resolveAndCheckConfigFileName(configName, cwd, options.templatePaths);
     const configDir = path.dirname(configFileName);
     
     console.log('cwd:', clc.blackBright(cwd));
@@ -35,7 +35,6 @@ async function prepare(configName, args, options) {
 
 async function scaffold (configName, args, options = {}) {
     const { config, data, cwd, configDir } = await prepare(configName, args, options);
-    const utils = options.utils;
     for (let i = 0; i < config.entities.length; i++) {
         const entity = config.entities[i];
         if (!entity) continue; // пропускаем шаг, если передан null или undefined (чтобы можно было пропускать шаги тернарным оператором при их написании) 
@@ -45,10 +44,10 @@ async function scaffold (configName, args, options = {}) {
             const command = commands[n];
             if (command.detect(entity)) {
                 if (!options.revert) {
-                    await command.execute(entity, { cwd, configDir, data, scaffold, utils });
+                    await command.execute(entity, { cwd, configDir, data, scaffold, options });
                 } else {
                     if (command.revert) {
-                        await command.revert(entity, { cwd, configDir, data, scaffold, utils });
+                        await command.revert(entity, { cwd, configDir, data, scaffold, options });
                     } else {
                         console.warn(clc.yellow(`Не определён revert для команды "${command.name}"`));
                     }
@@ -69,4 +68,3 @@ async function revert (configName, args, options) {
 
 module.exports = scaffold;
 module.exports.revert = revert;
-module.exports.resolveConfigFile = resolveConfigFile;
