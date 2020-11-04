@@ -1,3 +1,4 @@
+'use strict';
 require('./string');
 const path = require('path');
 const clc = require('cli-color');
@@ -5,8 +6,8 @@ const { resolveCwd, resolveConfigFile, resolveAndCheckConfigFileName } = require
 const { ask } = require('./requestor');
 const commands = require('./commands');
 
-module.exports = async function scaffold (configName, args, cwd) {
-    cwd = resolveCwd(cwd);
+async function prepare(configName, args, originalCwd) {
+    const cwd = resolveCwd(originalCwd);
     const configFileName = await resolveAndCheckConfigFileName(configName, cwd);
     const configDir = path.dirname(configFileName);
     
@@ -29,7 +30,11 @@ module.exports = async function scaffold (configName, args, cwd) {
             console.log('data:', clc.blackBright(JSON.stringify(data)));
         }
     }
-    
+    return { config, data, cwd, configDir };
+}
+
+async function scaffold (configName, args, originalCwd, options = {}) {
+    const { config, data, cwd, configDir } = await prepare(configName, args, originalCwd);
     for (let i = 0; i < config.entities.length; i++) {
         const entity = config.entities[i];
         if (!entity) continue; // пропускаем шаг, если передан null или undefined (чтобы можно было пропускать шаги тернарным оператором при их написании) 
@@ -38,7 +43,15 @@ module.exports = async function scaffold (configName, args, cwd) {
         for (let n = 0; n < commands.length; n++) {
             const command = commands[n];
             if (command.detect(entity)) {
-                await command.execute(entity, { cwd, configDir, data, scaffold });
+                if (!options.revert) {
+                    await command.execute(entity, { cwd, configDir, data, scaffold });
+                } else {
+                    if (command.revert) {
+                        await command.revert(entity, { cwd, configDir, data, scaffold });
+                    } else {
+                        console.warn(clc.yellow(`Не определён revert для команды "${command.name}"`));
+                    }
+                }
                 isEntityHandled = true;
                 break;
             }
@@ -49,4 +62,10 @@ module.exports = async function scaffold (configName, args, cwd) {
     }
 }
 
+async function revert (configName, args, cwd, options) {
+    return await scaffold(configName, args, cwd, { ...options, revert: true });
+}
+
+module.exports = scaffold;
+module.exports.revert = revert;
 module.exports.resolveConfigFile = resolveConfigFile;
