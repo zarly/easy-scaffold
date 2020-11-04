@@ -6,8 +6,8 @@ const { resolveCwd, resolveConfigFile, resolveAndCheckConfigFileName } = require
 const { ask } = require('./requestor');
 const commands = require('./commands');
 
-async function prepare(configName, args, originalCwd) {
-    const cwd = resolveCwd(originalCwd);
+async function prepare(configName, args, options) {
+    const cwd = resolveCwd(options.cwd);
     const configFileName = await resolveAndCheckConfigFileName(configName, cwd);
     const configDir = path.dirname(configFileName);
     
@@ -15,7 +15,7 @@ async function prepare(configName, args, originalCwd) {
     console.log('config:', clc.blackBright(configFileName));
     const { getConfig } = require(configFileName);
     
-    const config = await getConfig(args, cwd);
+    const config = await getConfig(args, cwd, options.utils);
     const data = 'function' === typeof config.data ? await config.data() : (config.data || args);
     console.log('data:', clc.blackBright(JSON.stringify(data)));
 
@@ -33,8 +33,8 @@ async function prepare(configName, args, originalCwd) {
     return { config, data, cwd, configDir };
 }
 
-async function scaffold (configName, args, originalCwd, options = {}) {
-    const { config, data, cwd, configDir } = await prepare(configName, args, originalCwd);
+async function scaffold (configName, args, options = {}) {
+    const { config, data, cwd, configDir } = await prepare(configName, args, options);
     for (let i = 0; i < config.entities.length; i++) {
         const entity = config.entities[i];
         if (!entity) continue; // пропускаем шаг, если передан null или undefined (чтобы можно было пропускать шаги тернарным оператором при их написании) 
@@ -62,8 +62,8 @@ async function scaffold (configName, args, originalCwd, options = {}) {
     }
 }
 
-async function revert (configName, args, cwd, options) {
-    return await scaffold(configName, args, cwd, { ...options, revert: true });
+async function revert (configName, args, options) {
+    return await scaffold(configName, args, { ...options, revert: true });
 }
 
 module.exports = scaffold;
