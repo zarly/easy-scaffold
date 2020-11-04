@@ -35,6 +35,7 @@ async function prepare(configName, args, options) {
 
 async function scaffold (configName, args, options = {}) {
     const { config, data, cwd, configDir } = await prepare(configName, args, options);
+    const utils = options.utils;
     for (let i = 0; i < config.entities.length; i++) {
         const entity = config.entities[i];
         if (!entity) continue; // пропускаем шаг, если передан null или undefined (чтобы можно было пропускать шаги тернарным оператором при их написании) 
@@ -44,10 +45,10 @@ async function scaffold (configName, args, options = {}) {
             const command = commands[n];
             if (command.detect(entity)) {
                 if (!options.revert) {
-                    await command.execute(entity, { cwd, configDir, data, scaffold });
+                    await command.execute(entity, { cwd, configDir, data, scaffold, utils });
                 } else {
                     if (command.revert) {
-                        await command.revert(entity, { cwd, configDir, data, scaffold });
+                        await command.revert(entity, { cwd, configDir, data, scaffold, utils });
                     } else {
                         console.warn(clc.yellow(`Не определён revert для команды "${command.name}"`));
                     }
