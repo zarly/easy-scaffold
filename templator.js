@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const ejs = require('ejs');
-var clc = require("cli-color");
+var clc = require("chalk");
 const { ask } = require('./requestor');
 
 const defaultOptions = {

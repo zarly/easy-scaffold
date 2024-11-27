@@ -1,4 +1,4 @@
-const clc = require('cli-color');
+const clc = require('chalk');
 
 module.exports = {
     name: 'scaffold',

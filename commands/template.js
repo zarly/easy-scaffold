@@ -1,6 +1,6 @@
 const util = require('util');
 const { exec } = require('child_process');
-const clc = require('cli-color');
+const clc = require('chalk');
 const { resolveFile, ensureParentDirsExist, ensureDirsExist, isDir } = require('../utils');
 const { handleTemplateDir, handleTemplateFile } = require('../templator');
 

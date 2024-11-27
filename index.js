@@ -1,7 +1,7 @@
 'use strict';
 require('./string');
 const path = require('path');
-const clc = require('cli-color');
+const clc = require('chalk');
 const { resolveCwd, resolveAndCheckConfigFileName } = require('./utils');
 const { ask } = require('./requestor');
 const commands = require('./commands');

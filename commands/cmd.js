@@ -1,4 +1,4 @@
-const clc = require('cli-color');
+const clc = require('chalk');
 const execSync = require('child_process').execSync;
 
 module.exports = {

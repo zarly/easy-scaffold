@@ -1,5 +1,5 @@
 const fs = require('fs');
-const clc = require('cli-color');
+const clc = require('chalk');
 const { resolveFile } = require('../utils');
 
 module.exports = {
